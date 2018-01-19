@@ -39,6 +39,7 @@ class Login extends Component{
         </div>
         <button className="ui submit button" type="submit">Submit</button>
       </form>
+
     )
   }
 }

@@ -74,11 +74,6 @@ class App extends Component {
     return (
       <div className="App">
         <Navbar isloggedIn={this.state.auth.isLoggedIn} handleLogout={this.handleLogout}/>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
-        <br></br>
 
         <div id="content" className="ui container">
           <Switch>
