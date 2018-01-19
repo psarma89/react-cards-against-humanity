@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import Login from './Login'
+import Signup from './Signup'
 import AuthAdapter from './Adapter'
 
 
@@ -34,9 +35,19 @@ class Main extends Component{
      }
    }
 
-  handleForm = (username, password) => {
+  handleFormLogin = (username, password) => {
     AuthAdapter.login({username: username, password: password})
     .then( user => {
+      if(!user.error){
+        this.setState({auth: { isLoggedIn: true, user: user}})
+        localStorage.setItem('token', user.token)
+      }
+    })
+  }
+
+  handleFormSignup = (username, password, passwordConfirm) => {
+    AuthAdapter.signup({user: {username: username, password: password, password_confirmation: passwordConfirm}})
+    .then(user => {
       if(!user.error){
         this.setState({auth: { isLoggedIn: true, user: user}})
         localStorage.setItem('token', user.token)
@@ -50,13 +61,18 @@ class Main extends Component{
   }
 
   render(){
-    console.log(this.state.auth)
-    console.log(localStorage.getItem('token'))
+
     return(
       <Switch>
-        <Route path='/' render={()=> {
-          return (<Login handleForm={this.handleForm} handleLogout={this.handleLogout}/>)
+        <Route path='/login' render={()=> {
+          return (<Login handleFormLogin={this.handleFormLogin} handleLogout={this.handleLogout}/>)
         }}/>
+      <Route path='/signup' render={()=> {
+          console.log(this.state)
+          console.log(localStorage)
+          return (<Signup handleFormSignup={this.handleFormSignup} />)
+        }}/>
+
       </Switch>
     )}
 }

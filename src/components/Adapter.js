@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 
-const baseUrl = 'http://25.77.145.33:3000/api/v1/'
+const baseUrl = 'http://192.168.4.103:3000/api/v1';
+export const API_WS_ROOT = 'ws://192.168.4.103:3000/cable';
 
 export default class AuthAdapter {
   static login (loginParams) {
@@ -8,6 +9,14 @@ export default class AuthAdapter {
       method: 'POST',
       headers: headers(),
       body: JSON.stringify(loginParams)
+    }).then(res => res.json())
+  }
+
+  static signup (signupParams) {
+    return fetch(`${baseUrl}/signup`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify(signupParams)
     }).then(res => res.json())
   }
 
