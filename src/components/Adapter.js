@@ -4,7 +4,7 @@ const baseUrl = 'http://192.168.4.103:3000/api/v1/'
 
 export class AuthAdapter {
   static login (loginParams) {
-    return fetch(`${baseUrl}/login`, {
+    return fetch(`${baseUrl}login`, {
       method: 'POST',
       headers: headers(),
       body: JSON.stringify(loginParams)
@@ -28,7 +28,7 @@ function headers () {
 
 export class RoomAdapter{
   static getRooms(){
-    return fetch(`${baseUrl}/rooms`, {
+    return fetch(`${baseUrl}rooms`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -36,6 +36,17 @@ export class RoomAdapter{
       }
     })
     .then(resp => resp.json())
+  }
+
+  static connectRoom(roomId){
+    return fetch(`${baseUrl}joinroom`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({userId: localStorage.getItem('token'), roomId: roomId})
+    })
   }
 
 }
