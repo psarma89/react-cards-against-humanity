@@ -1,4 +1,6 @@
 import React, {Component} from 'react'
+import { Redirect } from 'react-router'
+import AuthAdapter from './Adapter'
 
 class Login extends Component{
 
@@ -33,7 +35,6 @@ class Login extends Component{
           <input type="password" onChange={this.handlePassword} />
           <button type="Submit">Submit</button>
         </form>
-        <button onClick={this.props.handleLogout}>Logout</button>
       </div>
     )
   }

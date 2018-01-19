@@ -1,8 +1,8 @@
 import React, {Component} from 'react'
 
-const baseUrl = 'http://25.77.145.33:3000/api/v1/'
+const baseUrl = 'http://localhost:3000/api/v1/'
 
-export default class AuthAdapter {
+export class AuthAdapter {
   static login (loginParams) {
     return fetch(`${baseUrl}/login`, {
       method: 'POST',
@@ -24,4 +24,18 @@ function headers () {
     'Accept': 'application/json',
     'Authorization': localStorage.getItem('token')
   }
+}
+
+export class RoomAdapter{
+  static getRooms(){
+    return fetch(`${baseUrl}/rooms`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      }
+    })
+    .then(resp => resp.json())
+  }
+
 }

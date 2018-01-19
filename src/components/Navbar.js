@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 class Navbar extends Component{
   render(){
     return(
-      <p>Hello</p>
+      <button onClick={this.props.handleLogout}>Logout</button>
     )
   }
 }
