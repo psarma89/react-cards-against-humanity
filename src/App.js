@@ -37,7 +37,7 @@ class App extends Component {
 
   }
 
-  handleForm = (username, password) => {
+  signInForm = (username, password) => {
     AuthAdapter.login({username: username, password: password})
     .then( user => {
       if(!user.error){
@@ -65,7 +65,7 @@ class App extends Component {
         <Navbar handleLogout={this.handleLogout}/>
         <Switch>
           <Route exact path='/' render={()=> {
-            return (this.state.auth.isLoggedIn ? <Redirect to="/home" /> : <Login handleForm={this.handleForm} />)
+            return (this.state.auth.isLoggedIn ? <Redirect to="/home" /> : <Login handleForm={this.signInForm} />)
           }}/>
           <Route exact path='/home' render={()=>{
             return (this.state.auth.isLoggedIn ? <Home /> : <Redirect to="/" />)

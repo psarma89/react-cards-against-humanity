@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-const baseUrl = 'http://localhost:3000/api/v1/'
+const baseUrl = 'http://192.168.4.103:3000/api/v1/'
 
 export class AuthAdapter {
   static login (loginParams) {
