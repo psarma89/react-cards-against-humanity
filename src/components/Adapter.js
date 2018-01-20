@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
+//HOORAY!
 
-const baseUrl = 'http://localhost:3000/api/v1'
+const baseUrl = 'http://25.58.9.122:1337/api/v1'
 
 export class AuthAdapter {
   static login (loginParams) {
@@ -18,7 +19,7 @@ export class AuthAdapter {
       body: JSON.stringify(signupParams)
     }).then(res => res.json())
   }
-  
+
   static currentUser () {
     return fetch(`${baseUrl}/current_user`, {
       headers: headers()

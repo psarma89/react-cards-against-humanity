@@ -7,7 +7,7 @@ import Signup from './components/Signup'
 import Home from './components/Home'
 import Room from './components/Room'
 import {AuthAdapter} from './components/Adapter'
-
+//HOORAY
 
 class App extends Component {
   constructor(){
@@ -40,9 +40,10 @@ class App extends Component {
   handleFormSignIn = (username, password) => {
     AuthAdapter.login({username: username, password: password})
     .then( user => {
+      console.log(user)
       if(!user.error){
         this.setState({auth: {isLoggedIn: true, user: user}});
-        localStorage.setItem('token', user.token);
+        localStorage.setItem('token', user.response.data.token);
       } else{
         alert(user.error)
       }
@@ -50,8 +51,9 @@ class App extends Component {
   }
 
   handleFormSignUp = (username, password, passwordConfirm) => {
-    AuthAdapter.signup({user: {username: username, password: password, password_confirmation: passwordConfirm}})
+    AuthAdapter.signup({user: {username: username, password: password, confirmPassword: passwordConfirm}})
     .then(user => {
+      console.log(user)
       if(!user.error){
         this.setState({auth: { isLoggedIn: true, user: user}})
         localStorage.setItem('token', user.token)
@@ -86,7 +88,7 @@ class App extends Component {
               return (isLoggedIn ? <Redirect to="/home" /> : <Login handleForm={this.handleFormSignIn} />)
             }}/>
             <Route exact path='/home' render={()=>{
-              return (isLoggedIn ? <Home /> : <Redirect to="/login" />)
+              return (true ? <Home /> : <Redirect to="/login" />)
             }}/>
             <Route exact path='/room/:id' render={(props) => {
               return (isLoggedIn ? <Room {...props} /> : "FALSE")
