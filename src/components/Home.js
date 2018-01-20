@@ -18,7 +18,7 @@ class Home extends Component{
 
   handleRooms = () => {
     if(this.state.rooms.length>0){
-      return this.state.rooms.map((room) => <RoomCard room={room}/>)
+      return this.state.rooms.map((room) => <RoomCard key={room.id} room={room}/>)
     }
     // this.state.rooms.map((room) => <h1>hello</h1>)
   }

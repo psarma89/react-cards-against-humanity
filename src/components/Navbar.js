@@ -6,7 +6,7 @@ class Navbar extends Component{
     return(
       <div className="ui top fixed menu inverted">
         <div className="item">
-          <img src="https://i.ytimg.com/vi/iEV_bCe4VUk/maxresdefault.jpg" />
+          <img src="https://i.ytimg.com/vi/iEV_bCe4VUk/maxresdefault.jpg" alt="cards logo"/>
         </div>
 
         <div className="item">Cards Against Originality

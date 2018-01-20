@@ -24,7 +24,6 @@ class App extends Component {
      AuthAdapter.currentUser()
      .then(user => {
        if (!user.error) {
-         console.log("fetch user");
          this.setState({
            auth: {
              isLoggedIn: true,
@@ -38,24 +37,26 @@ class App extends Component {
 
   }
 
-  signInForm = (username, password) => {
+  handleFormSignIn = (username, password) => {
     AuthAdapter.login({username: username, password: password})
     .then( user => {
       if(!user.error){
         this.setState({auth: {isLoggedIn: true, user: user}});
         localStorage.setItem('token', user.token);
       } else{
-        alert('Failed')
+        alert(user.error)
       }
     })
   }
 
-  handleFormSignup = (username, password, passwordConfirm) => {
+  handleFormSignUp = (username, password, passwordConfirm) => {
     AuthAdapter.signup({user: {username: username, password: password, password_confirmation: passwordConfirm}})
     .then(user => {
       if(!user.error){
         this.setState({auth: { isLoggedIn: true, user: user}})
         localStorage.setItem('token', user.token)
+      }else{
+        alert(user.error)
       }
     })
   }
@@ -70,10 +71,11 @@ class App extends Component {
   }
 
   render() {
+    const { isLoggedIn } = this.state.auth;
 
     return (
       <div className="App">
-        <Navbar isloggedIn={this.state.auth.isLoggedIn} handleLogout={this.handleLogout}/>
+        <Navbar isloggedIn={isLoggedIn} handleLogout={this.handleLogout}/>
 
         <div id="content" className="ui container">
           <Switch>
@@ -81,16 +83,16 @@ class App extends Component {
               return (<Redirect to="/login" />)
             }}/>
             <Route exact path='/login' render={()=> {
-              return (this.state.auth.isLoggedIn ? <Redirect to="/home" /> : <Login handleForm={this.signInForm} />)
+              return (isLoggedIn ? <Redirect to="/home" /> : <Login handleForm={this.handleFormSignIn} />)
             }}/>
             <Route exact path='/home' render={()=>{
-              return (this.state.auth.isLoggedIn ? <Home /> : <Redirect to="/login" />)
+              return (isLoggedIn ? <Home /> : <Redirect to="/login" />)
             }}/>
             <Route exact path='/room/:id' render={(props) => {
-              return (this.state.auth.isLoggedIn ? <Room {...props} /> : "FALSE")
+              return (isLoggedIn ? <Room {...props} /> : "FALSE")
             }}/>
             <Route exact path='/signup' render={() => {
-              return (this.state.auth.isLoggedIn ? <Redirect to="/home" /> : <Signup handleForm={this.handleFormSignup} />)
+              return (isLoggedIn ? <Redirect to="/home" /> : <Signup handleForm={this.handleFormSignUp} />)
             }}/>
           </Switch>
 

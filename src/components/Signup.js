@@ -26,7 +26,7 @@ class Signup extends Component{
 
   handleForm = (event) => {
     event.preventDefault()
-    this.props.handleFormSignup(this.state.username, this.state.password, this.state.passwordConfirm)
+    this.props.handleForm(this.state.username, this.state.password, this.state.passwordConfirm)
   }
 
   render(){

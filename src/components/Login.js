@@ -1,6 +1,4 @@
 import React, {Component} from 'react'
-import { Redirect } from 'react-router'
-import AuthAdapter from './Adapter'
 
 class Login extends Component{
 

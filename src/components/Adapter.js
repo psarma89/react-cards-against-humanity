@@ -1,18 +1,26 @@
-import React, {Component} from 'react'
+import React, {Component} from 'react';
 
-const baseUrl = 'http://192.168.4.103:3000/api/v1/'
+const baseUrl = 'http://localhost:3000/api/v1'
 
 export class AuthAdapter {
   static login (loginParams) {
-    return fetch(`${baseUrl}login`, {
+    return fetch(`${baseUrl}/login`, {
       method: 'POST',
       headers: headers(),
       body: JSON.stringify(loginParams)
     }).then(res => res.json())
   }
 
+  static signup (signupParams) {
+    return fetch(`${baseUrl}/signup`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify(signupParams)
+    }).then(res => res.json())
+  }
+  
   static currentUser () {
-    return fetch(`${baseUrl}current_user`, {
+    return fetch(`${baseUrl}/current_user`, {
       headers: headers()
     }).then(res => res.json())
   }
@@ -28,7 +36,7 @@ function headers () {
 
 export class RoomAdapter{
   static getRooms(){
-    return fetch(`${baseUrl}rooms`, {
+    return fetch(`${baseUrl}/rooms`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +47,7 @@ export class RoomAdapter{
   }
 
   static connectRoom(roomId){
-    return fetch(`${baseUrl}joinroom`, {
+    return fetch(`${baseUrl}/joinroom`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
