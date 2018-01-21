@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Home from './components/Home';
 import Room from './components/Room';
+import NewRoom from './components/NewRoom';
 import {AuthAdapter} from './components/Adapter';
 //HOORAY
 
@@ -51,7 +52,7 @@ class App extends Component {
   }
 
   handleFormSignUp = (username, password, passwordConfirm) => {
-    AuthAdapter.signup({user: {username: username, password: password, confirmPassword: passwordConfirm}})
+    AuthAdapter.signup({username: username, password: password, confirmPassword: passwordConfirm})
     .then(user => {
       console.log(user)
       if(!user.error){
@@ -87,11 +88,14 @@ class App extends Component {
             <Route exact path='/login' render={()=> {
               return (isLoggedIn ? <Redirect to="/home" /> : <Login handleForm={this.handleFormSignIn} />)
             }}/>
+            <Route exact path='/room/create' render={() => {
+                return (isLoggedIn ? <NewRoom /> : <Redirect to="/login" />)
+              }}/>
             <Route exact path='/home' render={()=>{
               return (isLoggedIn ? <Home /> : <Redirect to="/login" />)
             }}/>
             <Route exact path='/room/:id' render={(props) => {
-              return (isLoggedIn ? <Room {...props} /> : "FALSE")
+              return (isLoggedIn ? <Room {...props} /> : <Redirect to="/login" />)
             }}/>
             <Route exact path='/signup' render={() => {
               return (isLoggedIn ? <Redirect to="/home" /> : <Signup handleForm={this.handleFormSignUp} />)

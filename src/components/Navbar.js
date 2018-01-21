@@ -15,6 +15,10 @@ class Navbar extends Component{
         <div className="right menu">
           {this.props.isloggedIn ? (
             <div className="item">
+              <Link to="/home" className="item">
+                <div className="ui button">Homepage</div>
+              </Link>
+
               <button onClick={this.props.handleLogout}
               className="ui button">Log Out</button>
             </div>

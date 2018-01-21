@@ -4,7 +4,7 @@ import React, {Component} from 'react';
 const baseUrl = 'http://25.58.9.122:1337/api/v1'
 
 export class AuthAdapter {
-  static login (loginParams) {
+  static login(loginParams) {
     return fetch(`${baseUrl}/login`, {
       method: 'POST',
       headers: headers(),
@@ -12,7 +12,7 @@ export class AuthAdapter {
     }).then(res => res.json())
   }
 
-  static signup (signupParams) {
+  static signup(signupParams) {
     return fetch(`${baseUrl}/signup`, {
       method: 'POST',
       headers: headers(),
@@ -20,22 +20,32 @@ export class AuthAdapter {
     }).then(res => res.json())
   }
 
-  static currentUser () {
+  static currentUser() {
     return fetch(`${baseUrl}/current_user`, {
+      headers: headers()
+    }).then(res => res.json())
+  }
+
+  static userInfo(id) {
+    return fetch(`${baseUrl}/user/${id}`, {
       headers: headers()
     }).then(res => res.json())
   }
 }
 
-function headers () {
-  return {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': localStorage.getItem('token')
-  }
-}
-
 export class RoomAdapter{
+  static createRoom(payload){
+    return fetch(`${baseUrl}/rooms/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+  }
+
   static getRooms(){
     return fetch(`${baseUrl}/rooms`, {
       method: 'GET',
@@ -48,14 +58,23 @@ export class RoomAdapter{
   }
 
   static connectRoom(roomId){
-    return fetch(`${baseUrl}/joinroom`, {
+    return fetch(`${baseUrl}/rooms/${roomId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify({userId: localStorage.getItem('token'), roomId: roomId})
-    })
+      body: JSON.stringify({userId: localStorage.getItem('token')})
+    }).then(resp => resp.json())
   }
 
+}
+
+
+function headers () {
+  return {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': localStorage.getItem('token')
+  }
 }

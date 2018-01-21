@@ -4,9 +4,8 @@ import {RoomAdapter} from './Adapter'
 class Room extends Component{
   constructor(props){
     super(props)
-
+    console.log("anything?")
     RoomAdapter.connectRoom(props.match.params.id)
-    .then(resp => resp.json())
     .then(resp => console.log(resp))
 
   }
@@ -16,7 +15,7 @@ class Room extends Component{
   render(){
     return(
       <div>
-
+        <h1>Testing</h1>
       </div>
     )
   }
