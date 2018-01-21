@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import Navbar from './components/Navbar';
-import { Redirect } from 'react-router'
-import { Switch, Route } from 'react-router-dom'
-import Login from './components/Login'
-import Signup from './components/Signup'
-import Home from './components/Home'
-import Room from './components/Room'
-import {AuthAdapter} from './components/Adapter'
+import { Redirect } from 'react-router';
+import { Switch, Route } from 'react-router-dom';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Home from './components/Home';
+import Room from './components/Room';
+import {AuthAdapter} from './components/Adapter';
 //HOORAY
 
 class App extends Component {
@@ -88,7 +88,7 @@ class App extends Component {
               return (isLoggedIn ? <Redirect to="/home" /> : <Login handleForm={this.handleFormSignIn} />)
             }}/>
             <Route exact path='/home' render={()=>{
-              return (true ? <Home /> : <Redirect to="/login" />)
+              return (isLoggedIn ? <Home /> : <Redirect to="/login" />)
             }}/>
             <Route exact path='/room/:id' render={(props) => {
               return (isLoggedIn ? <Room {...props} /> : "FALSE")
