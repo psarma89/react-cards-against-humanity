@@ -19,16 +19,9 @@ const RoomDetail = ({room}) => {
     players = <li>No one Here yet</li>
   }
 
-  // const handleJoin = (room) =>{
-  //   AuthAdapter.connectRoom(room.id)
-  //   return (<Redirect to={"/room/" + room.id} />)
-  // }
-  //onClick={() => handleJoin(room)}
-
   return room ? (
     <div className="ui segment inverted">
       <Link to={"/room/" + room.id}
-        
         className="ui right floated labeled icon button">
         <i className="right arrow icon"></i>
         Join
