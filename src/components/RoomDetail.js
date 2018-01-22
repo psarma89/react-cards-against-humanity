@@ -5,20 +5,16 @@ import {AuthAdapter} from './Adapter';
 import {RoomAdapter} from './Adapter';
 
 const RoomDetail = ({room}) => {
+  console.log(room)
   let players;
-  // if (room.players.length > 0) {
-  //   AuthAdapter.allUsers().then(resp => {
-  //     players = room.players.map(player => {
-  //       const foundPlayer = resp.find(r =>{
-  //         return r.id === player.id
-  //       })
-  //       return foundPlayer ? <li key={player.id}>{foundPlayer.username}</li> : null
-  //     })
-  //   })
-  // }else {
-  //   players = <li>No one Here yet</li>
-  // }
-  //
+  if (room.players.length > 0) {
+    players = room.players.map(player => {
+      return <li key={player.userId}>{player.username}</li>
+    })
+  }else {
+    players = <li>No one Here yet</li>
+  }
+
   return room ? (
     <div className="ui segment inverted">
       <Link to={"/room/" + room.id}

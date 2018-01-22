@@ -50,6 +50,7 @@ export class RoomAdapter{
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Authorization': localStorage.getItem('token')
       },
       body: JSON.stringify(payload)
     })
@@ -69,7 +70,7 @@ export class RoomAdapter{
   }
 
   static connectRoom(roomId){
-    return fetch(`${baseUrl}/rooms/${roomId}`, {
+    return fetch(`${baseUrl}/room/${roomId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,8 +99,8 @@ export class UserAdapter{
   }
 
   static readyPlayer(payload){
-    fetch(`${baseUrl}/rooms/update`, {
-      method: 'PUT',
+    return fetch(`${baseUrl}/rooms/update`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

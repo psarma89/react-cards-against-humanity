@@ -57,7 +57,7 @@ class App extends Component {
       console.log(user)
       if(!user.error){
         this.setState({auth: { isLoggedIn: true, user: user}})
-        localStorage.setItem('token', user.token)
+        localStorage.setItem('token', user.response.data.token)
       }else{
         alert(user.error)
       }

@@ -15,7 +15,8 @@ class Home extends Component{
     }
 
     RoomAdapter.getRooms().then(resp => {
-      this.setState({rooms: resp, selectedRoom: [resp[0]]})
+      console.log(resp)
+      this.setState({rooms: resp, selectedRoom: [resp[0]]}, () => console.log(this.state))
     })
   }
 
@@ -45,7 +46,7 @@ class Home extends Component{
 
           {this.handleRooms()}
         </div>
-        {this.state.selectedRoom.length > 0 ?
+        {this.state.rooms.length > 0 && this.state.selectedRoom.length > 0 ?
           <div className="twelve wide column">
             <RoomDetail room={this.state.selectedRoom[0]} />
           </div> : null
