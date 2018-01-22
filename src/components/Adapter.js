@@ -62,6 +62,7 @@ export class RoomAdapter{
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Authorization': localStorage.getItem('token')
       }
     })
     .then(resp => resp.json())
@@ -73,6 +74,7 @@ export class RoomAdapter{
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Authorization': localStorage.getItem('token')
       },
       body: JSON.stringify({userId: localStorage.getItem('token')})
     })
@@ -88,8 +90,22 @@ export class UserAdapter{
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
+        'Authorization': localStorage.getItem('token')
       },
       body: JSON.stringify({cardArray: payload})
+    })
+    .then(resp => resp.json())
+  }
+
+  static readyPlayer(payload){
+    fetch(`${baseUrl}/rooms/update`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': localStorage.getItem('token')
+      },
+      body: JSON.stringify(payload)
     })
     .then(resp => resp.json())
   }
