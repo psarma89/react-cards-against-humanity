@@ -15,8 +15,6 @@ class Room extends Component{
 
   }
 
-
-
   render(){
     console.log(this.state.userHand)
     return(
