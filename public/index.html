@@ -43,7 +43,7 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sails.io.js.will@0.11.8/sails.io.min.js"></script>
 
     <script type="text/javascript">
-      io.sails.url = 'http://25.58.9.122:1337';
+      io.sails.url = 'http://192.168.4.196:1337';
       io.socket.on('room', function(event){console.log(event);})
       io.socket.get('/room', function(resData, jwres) {console.log(resData);})
     </script>
