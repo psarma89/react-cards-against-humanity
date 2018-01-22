@@ -17,19 +17,29 @@ export class AuthAdapter {
       method: 'POST',
       headers: headers(),
       body: JSON.stringify(signupParams)
-    }).then(res => res.json())
+    })
+    .then(res => res.json())
+  }
+
+  static allUsers() {
+    return fetch(`${baseUrl}/user`, {
+      headers: headers()
+    })
+    .then(res => res.json())
   }
 
   static currentUser() {
     return fetch(`${baseUrl}/current_user`, {
       headers: headers()
-    }).then(res => res.json())
+    })
+    .then(res => res.json())
   }
 
   static userInfo(id) {
     return fetch(`${baseUrl}/user/${id}`, {
       headers: headers()
-    }).then(res => res.json())
+    })
+    .then(res => res.json())
   }
 }
 
@@ -65,9 +75,24 @@ export class RoomAdapter{
         'Accept': 'application/json',
       },
       body: JSON.stringify({userId: localStorage.getItem('token')})
-    }).then(resp => resp.json())
+    })
+    .then(resp => resp.json())
   }
 
+}
+
+export class UserAdapter{
+  static getHand(payload){
+    return fetch(`${baseUrl}/cards`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({cardArray: payload})
+    })
+    .then(resp => resp.json())
+  }
 }
 
 

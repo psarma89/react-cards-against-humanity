@@ -75,6 +75,7 @@ class App extends Component {
 
   render() {
     const { isLoggedIn } = this.state.auth;
+    // AuthAdapter.currentUser().then(resp => console.log(resp))
 
     return (
       <div className="App">
