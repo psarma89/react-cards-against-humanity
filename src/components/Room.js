@@ -12,7 +12,7 @@ const sampleRoom = {
     "title" : "Chris' Room",
     "players" : [
         {
-            "userId" : "5a65f15ac2c99193b69c3647",
+            "userId" : "5a66137a79fb55bc46fac60c",
             "ready" : false,
             "username" : "chris198"
         },
@@ -31,8 +31,8 @@ const sampleRoom = {
         }
     ],
     "currentTurn" : {
-        "userId" : 1,
-        "blackCard" : null,
+        "userId" : "5a66137a79fb55bc46fac60c",
+        "blackCard" : {id: 1, text: "This is a blackcard"},
         "pickedCards" : [],
         "currentHands" : [
             {
@@ -81,14 +81,16 @@ const sampleRoom = {
         "whiteCards" : []
     }
 }
+const userHand1 =
+[{id: 37, text: "Cheating in the Special Olympics."},{id: 38, text: "German dungeon porn."},{id: 118, text: "Five-Dollar Footlongs&trade;."},{id: 219, text: "Altar boys."},{id: 393, text: "Passive-aggressive Post-it notes."}]
 
 class Room extends Component{
   constructor(props){
     super(props)
 
     this.state = {
-      room: [],
-      userHand: '',
+      room: sampleRoom,
+      userHand: userHand1,
       userLoggedIn: ''
     }
 
@@ -97,27 +99,26 @@ class Room extends Component{
   componentDidMount(){
 
     AuthAdapter.currentUser().then(resp => {
-      console.log(resp.response.data.user.id))
-    }
-    var io = sailsIOClient(socketIOClient);
-    io.sails.useCORSRouteToGetCookie = false;
-    io.sails.url = 'http://localhost:1337';
-    io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
-      console.log('what is my data', data)
-      UserAdapter.getHand(data.hand).then(resp => this.setState({userHand: resp, room: data.roomData}), () => console.log(this.state))
+      // console.log(resp.response.data.user.id)
+      this.setState({userLoggedIn: resp.response.data.user.id}, () => console.log(this.state))
     })
-    io.socket.on("room", (event) => {
-      switch (event.verb) {
-      case 'updated':
-        console.log(event);
-        this.setState({room: event.data}, () => console.log(this.state))
-        break;
-      default:
-        console.warn('Unrecognized socket event (`%s`) from server:',event.verb, event);
-      }
-    })
-
-
+    // var io = sailsIOClient(socketIOClient);
+    // io.sails.useCORSRouteToGetCookie = false;
+    // io.sails.url = 'http://localhost:1337';
+    // io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
+    //   console.log('what is my data', data)
+    //   UserAdapter.getHand(data.hand).then(resp => this.setState({userHand: resp, room: data.roomData}, () => console.log(this.state)))
+    // })
+    // io.socket.on("room", (event) => {
+    //   switch (event.verb) {
+    //   case 'updated':
+    //     console.log(event);
+    //     this.setState({room: event.data}, () => console.log(this.state))
+    //     break;
+    //   default:
+    //     console.warn('Unrecognized socket event (`%s`) from server:',event.verb, event);
+    //   }
+    // })
   }
 
   handleCards = () => {
@@ -127,12 +128,6 @@ class Room extends Component{
         return (<Card key={card.id} card={card} />)
       })
     }
-  }
-
-  handleWebSocket = response => {
-    this.setState({
-
-    })
   }
 
   readyPlayer = () => {
@@ -145,10 +140,20 @@ class Room extends Component{
     //this.setState({roomReady: true})
   }
 
+  currentTurnUser = () => {
+    return this.state.userLoggedIn === this.state.room.currentTurn.currentUser
+  }
+
   render(){
     return(
       <div>
         <div className="ui button" onClick={this.readyPlayer}>Ready
+        </div>
+
+        <br></br>
+
+        <div>{"Whose Turn is it: " + this.state.room.players.find(player => {return player.userId === this.state.room.currentTurn.userId}).username
+        }
         </div>
 
         <br></br>
@@ -161,9 +166,9 @@ class Room extends Component{
         <br></br>
         <h3>Blackcard</h3>
 
-        {this.state.blackCard ?
+        {this.state.room.roomReady ?
             <div className="ui one column grid">
-              <BlackCard card={{id: 1, text: "This is a blackcard"}} />
+              <BlackCard card={this.state.room.currentTurn.blackCard} />
             </div> : null
         }
       </div>

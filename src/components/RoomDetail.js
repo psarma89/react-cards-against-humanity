@@ -5,7 +5,7 @@ import {AuthAdapter} from './Adapter';
 import {RoomAdapter} from './Adapter';
 
 const RoomDetail = ({room}) => {
-  console.log(room)
+  // console.log(room)
   let players;
   if (room.players.length > 0) {
     players = room.players.map(player => {
