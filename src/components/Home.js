@@ -19,15 +19,11 @@ class Home extends Component{
     io.sails.useCORSRouteToGetCookie = false;
     io.sails.url = 'http://localhost:1337';
     io.socket.get('/api/v1/rooms', (data, jwr) => {
+      this.setState({rooms: data, selectedRoom: [data[0]]}, () => console.log(this.state))
       io.socket.on('new_entry', (entry) => {
-        console.log(entry)
+        //console.log(entry)
         this.setState({rooms: [...this.state.rooms, entry]})
       })
-    })
-
-    RoomAdapter.getRooms().then(resp => {
-      console.log(resp)
-      this.setState({rooms: resp, selectedRoom: [resp[0]]}, () => console.log(this.state))
     })
   }
 

@@ -42,7 +42,7 @@ class App extends Component {
     AuthAdapter.login({username: username, password: password})
     .then( user => {
       console.log(user)
-      if(user.data){
+      if(user.response.data){
         this.setState({auth: {isLoggedIn: true, user: user}});
         localStorage.setItem('token', user.response.data.token);
       } else{
@@ -55,7 +55,7 @@ class App extends Component {
     AuthAdapter.signup({username: username, password: password, confirmPassword: passwordConfirm})
     .then(user => {
       console.log(user)
-      if(user.data){
+      if(user.response.data){
         this.setState({auth: { isLoggedIn: true, user: user}})
         localStorage.setItem('token', user.response.data.token)
       }else{

@@ -1,34 +1,130 @@
 import React, {Component} from 'react'
-import {RoomAdapter, UserAdapter} from './Adapter'
+import {RoomAdapter, UserAdapter, AuthAdapter} from './Adapter'
 import Card from './Card'
 import BlackCard from './BlackCard'
 import { Link } from 'react-router-dom';
 var socketIOClient = require('socket.io-client');
 var sailsIOClient = require('sails.io.js');
 
+const sampleRoom = {
+    "id" : "5a674a719501ebf24ffc4e80",
+    "roomReady" : true,
+    "title" : "Chris' Room",
+    "players" : [
+        {
+            "userId" : "5a65f15ac2c99193b69c3647",
+            "ready" : false,
+            "username" : "chris198"
+        },
+        {
+            "userId" : "5a6625ad37fd89e90f894cb2",
+            "ready" : true,
+            "username" : "cjohnson"
+        },
+        {
+            "userId" : "5a65f96c7f0359cb039b91de",
+            "ready" : true,
+            "username" : "patrick"
+        },
+        {
+            "ready" : false
+        }
+    ],
+    "currentTurn" : {
+        "userId" : 1,
+        "blackCard" : null,
+        "pickedCards" : [],
+        "currentHands" : [
+            {
+                "userId" : "5a65f15ac2c99193b69c3647",
+                "hand" : [
+                    258,
+                    6,
+                    443,
+                    311,
+                    8
+                ]
+            },
+            {
+                "userId" : "5a6625ad37fd89e90f894cb2",
+                "hand" : [
+                    83,
+                    403,
+                    233,
+                    422,
+                    229
+                ]
+            },
+            {
+                "userId" : "5a65f96c7f0359cb039b91de",
+                "hand" : [
+                    137,
+                    392,
+                    292,
+                    287,
+                    226
+                ]
+            },
+            {
+                "hand" : [
+                    233,
+                    454,
+                    93,
+                    280,
+                    28
+                ]
+            }
+        ]
+    },
+    "graveYard" : {
+        "blackCards" : [],
+        "whiteCards" : []
+    }
+}
 
 class Room extends Component{
   constructor(props){
     super(props)
 
     this.state = {
+      room: [],
       userHand: '',
-      blackCard: '',
-      roomReady: false
+      userLoggedIn: ''
     }
 
-    RoomAdapter.connectRoom(props.match.params.id)
-    .then(resp => {
-      console.log(resp)
-      UserAdapter.getHand(resp.hand).then(resp => this.setState({userHand: resp}))
+  }
+
+  componentDidMount(){
+
+    AuthAdapter.currentUser().then(resp => {
+      console.log(resp.response.data.user.id))
+    }
+    var io = sailsIOClient(socketIOClient);
+    io.sails.useCORSRouteToGetCookie = false;
+    io.sails.url = 'http://localhost:1337';
+    io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
+      console.log('what is my data', data)
+      UserAdapter.getHand(data.hand).then(resp => this.setState({userHand: resp, room: data.roomData}), () => console.log(this.state))
     })
+    io.socket.on("room", (event) => {
+      switch (event.verb) {
+      case 'updated':
+        console.log(event);
+        this.setState({room: event.data}, () => console.log(this.state))
+        break;
+      default:
+        console.warn('Unrecognized socket event (`%s`) from server:',event.verb, event);
+      }
+    })
+
+
   }
 
   handleCards = () => {
     let userHand = this.state.userHand
     if(userHand && userHand.length > 0){
       return userHand.map((card) => {
-        return (<Card card={card} />)
+        return (<Card key={card.id} card={card} />)
       })
     }
   }
