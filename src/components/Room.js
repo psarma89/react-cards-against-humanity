@@ -6,91 +6,12 @@ import { Link } from 'react-router-dom';
 var socketIOClient = require('socket.io-client');
 var sailsIOClient = require('sails.io.js');
 
-const sampleRoom = {
-    "id" : "5a674a719501ebf24ffc4e80",
-    "roomReady" : true,
-    "title" : "Chris' Room",
-    "players" : [
-        {
-            "userId" : "5a66137a79fb55bc46fac60c",
-            "ready" : false,
-            "username" : "chris198"
-        },
-        {
-            "userId" : "5a6625ad37fd89e90f894cb2",
-            "ready" : true,
-            "username" : "cjohnson"
-        },
-        {
-            "userId" : "5a65f96c7f0359cb039b91de",
-            "ready" : true,
-            "username" : "patrick"
-        },
-        {
-            "ready" : false
-        }
-    ],
-    "currentTurn" : {
-        "userId" : "5a66137a79fb55bc46fac60c",
-        "blackCard" : {id: 1, text: "This is a blackcard"},
-        "pickedCards" : [],
-        "currentHands" : [
-            {
-                "userId" : "5a65f15ac2c99193b69c3647",
-                "hand" : [
-                    258,
-                    6,
-                    443,
-                    311,
-                    8
-                ]
-            },
-            {
-                "userId" : "5a6625ad37fd89e90f894cb2",
-                "hand" : [
-                    83,
-                    403,
-                    233,
-                    422,
-                    229
-                ]
-            },
-            {
-                "userId" : "5a65f96c7f0359cb039b91de",
-                "hand" : [
-                    137,
-                    392,
-                    292,
-                    287,
-                    226
-                ]
-            },
-            {
-                "hand" : [
-                    233,
-                    454,
-                    93,
-                    280,
-                    28
-                ]
-            }
-        ]
-    },
-    "graveYard" : {
-        "blackCards" : [],
-        "whiteCards" : []
-    }
-}
-const userHand1 =
-[{id: 37, text: "Cheating in the Special Olympics."},{id: 38, text: "German dungeon porn."},{id: 118, text: "Five-Dollar Footlongs&trade;."},{id: 219, text: "Altar boys."},{id: 393, text: "Passive-aggressive Post-it notes."}]
-
 class Room extends Component{
   constructor(props){
     super(props)
 
     this.state = {
-      room: sampleRoom,
-      userHand: userHand1,
+      userHand: '',
       userLoggedIn: ''
     }
 
@@ -99,26 +20,34 @@ class Room extends Component{
   componentDidMount(){
 
     AuthAdapter.currentUser().then(resp => {
-      // console.log(resp.response.data.user.id)
-      this.setState({userLoggedIn: resp.response.data.user.id}, () => console.log(this.state))
-    })
-    // var io = sailsIOClient(socketIOClient);
-    // io.sails.useCORSRouteToGetCookie = false;
-    // io.sails.url = 'http://localhost:1337';
-    // io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
-    //   console.log('what is my data', data)
-    //   UserAdapter.getHand(data.hand).then(resp => this.setState({userHand: resp, room: data.roomData}, () => console.log(this.state)))
-    // })
-    // io.socket.on("room", (event) => {
-    //   switch (event.verb) {
-    //   case 'updated':
-    //     console.log(event);
-    //     this.setState({room: event.data}, () => console.log(this.state))
-    //     break;
-    //   default:
-    //     console.warn('Unrecognized socket event (`%s`) from server:',event.verb, event);
-    //   }
-    // })
+        // console.log(resp.response.data.user.id)
+        this.setState({userLoggedIn: resp.response.data.user.id})
+      })
+      var io = sailsIOClient(socketIOClient);
+      io.sails.useCORSRouteToGetCookie = false;
+      io.sails.headers = {'Authorization': localStorage.getItem('token')}
+      io.sails.url = 'http://192.168.4.196:1337';
+      io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
+        // console.log('what is my data', data)
+
+        //console.log(data.roomData.players.find((player) => {return player.userId == this.state.userLoggedIn})
+
+      })
+      io.socket.on("room", (event) => {
+        switch (event.verb) {
+        case 'updated':
+
+        console.log(event)
+        event.data.roomData.currentTurn.currentHands.find((player) => {
+          if(player.userId === this.state.userLoggedIn){
+            UserAdapter.getHand(player.hand).then(resp => this.setState({userHand: resp, room: event.data}))
+          }
+        })
+          break;
+        default:
+          console.warn('Unrecognized socket event (`%s`) from server:',event.verb, event);
+        }
+      })
   }
 
   handleCards = () => {
@@ -133,18 +62,36 @@ class Room extends Component{
   readyPlayer = () => {
     UserAdapter.readyPlayer({roomId: this.props.match.params.id}).then(resp => {
       console.log(resp)
-      if(resp.roomReady){
-        this.setState({roomReady: true})
+      // console.log(this.state.room)
+      if(resp.data){
+        this.setState({room: resp.data}, () => console.log(this.state.room))
       }
     })
     //this.setState({roomReady: true})
   }
 
   currentTurnUser = () => {
-    return this.state.userLoggedIn === this.state.room.currentTurn.currentUser
+    return this.state.userLoggedIn === this.state.room.roomData.currentTurn.currentUser
+  }
+
+  whoseTurnIsIt = () => {
+    var foundUser;
+    if (this.state.room && this.state.room.roomData) {
+      const currentTurn = this.state.room.roomData.currentTurn.userId;
+      this.state.room.roomData.players.find(player => {
+         if(player.userId == currentTurn){
+           foundUser = 18727368
+         }
+       })
+    }
+    console.log(foundUser)
+    return foundUser
+
   }
 
   render(){
+
+    console.log(this.state.room)
     return(
       <div>
         <div className="ui button" onClick={this.readyPlayer}>Ready
@@ -152,9 +99,8 @@ class Room extends Component{
 
         <br></br>
 
-        <div>{"Whose Turn is it: " + this.state.room.players.find(player => {return player.userId === this.state.room.currentTurn.userId}).username
-        }
-        </div>
+      {console.log(this.whoseTurnIsIt())
+      }
 
         <br></br>
         <h3>Your Hand:</h3>
@@ -166,11 +112,12 @@ class Room extends Component{
         <br></br>
         <h3>Blackcard</h3>
 
-        {this.state.room.roomReady ?
-            <div className="ui one column grid">
-              <BlackCard card={this.state.room.currentTurn.blackCard} />
-            </div> : null
+        {this.state.room && this.state.room.roomData.roomReady ?
+          <div className="ui one column grid">
+            <BlackCard card={this.state.room.roomData.currentTurn.blackCard} />
+          </div> : null
         }
+
       </div>
     )
   }
