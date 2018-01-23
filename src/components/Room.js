@@ -3,6 +3,9 @@ import {RoomAdapter, UserAdapter} from './Adapter'
 import Card from './Card'
 import BlackCard from './BlackCard'
 import { Link } from 'react-router-dom';
+var socketIOClient = require('socket.io-client');
+var sailsIOClient = require('sails.io.js');
+
 
 class Room extends Component{
   constructor(props){
@@ -32,7 +35,7 @@ class Room extends Component{
 
   handleWebSocket = response => {
     this.setState({
-      
+
     })
   }
 

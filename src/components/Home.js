@@ -4,15 +4,26 @@ import RoomList from './RoomList';
 import RoomDetail from './RoomDetail';
 import { Redirect } from 'react-router';
 import { Link } from 'react-router-dom';
+var socketIOClient = require('socket.io-client');
+var sailsIOClient = require('sails.io.js');
+
 
 class Home extends Component{
   constructor(){
     super()
-
     this.state = {
       rooms: [],
       selectedRoom: []
     }
+    var io = sailsIOClient(socketIOClient);
+    io.sails.useCORSRouteToGetCookie = false;
+    io.sails.url = 'http://localhost:1337';
+    io.socket.get('/api/v1/rooms', (data, jwr) => {
+      io.socket.on('new_entry', (entry) => {
+        console.log(entry)
+        this.setState({rooms: [...this.state.rooms, entry]})
+      })
+    })
 
     RoomAdapter.getRooms().then(resp => {
       console.log(resp)
@@ -34,7 +45,6 @@ class Home extends Component{
   }
 
   render(){
-
     return(
       <div className="ui grid">
         <div className="four wide column">
