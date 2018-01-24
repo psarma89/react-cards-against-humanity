@@ -13,8 +13,18 @@ class Home extends Component{
     super()
     this.state = {
       rooms: [],
-      selectedRoom: []
+      selectedRoom: [],
+      username: ''
     }
+
+  }
+
+  componentDidMount(){
+    AuthAdapter.currentUser().then(resp => {
+      console.log('username', resp.response.data)
+      this.setState({username: resp.response.data.user.id})
+    })
+
     var io = sailsIOClient(socketIOClient);
     io.sails.useCORSRouteToGetCookie = false;
     io.sails.url = 'http://25.57.52.41:1337';
@@ -26,6 +36,7 @@ class Home extends Component{
         this.setState({rooms: [...this.state.rooms, entry]})
       })
     })
+
   }
 
   handleRooms = () => {
@@ -54,6 +65,7 @@ class Home extends Component{
           {this.handleRooms()}
         </div>
         {this.state.rooms.length > 0 && this.state.selectedRoom.length > 0 ?
+          <h3>{`Welcome ${this.state.username}`}</h3>
           <div className="twelve wide column">
             <RoomDetail room={this.state.selectedRoom[0]} />
           </div> : null
