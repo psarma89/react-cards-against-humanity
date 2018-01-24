@@ -3,6 +3,7 @@ import {RoomAdapter, UserAdapter, AuthAdapter} from './Adapter'
 import Card from './Card'
 import BlackCard from './BlackCard'
 import { Link } from 'react-router-dom';
+var _ = require('lodash');
 var socketIOClient = require('socket.io-client');
 var sailsIOClient = require('sails.io.js');
 
@@ -37,7 +38,6 @@ class Room extends Component{
         switch (event.verb) {
         case 'updated':
 
-        console.log(event)
         event.data.roomData.currentTurn.currentHands.find((player) => {
           if(player.userId === this.state.userLoggedIn){
             UserAdapter.getHand(player.hand).then(resp => this.setState({userHand: resp, room: event.data}))
@@ -54,8 +54,48 @@ class Room extends Component{
     let userHand = this.state.userHand
     if(userHand && userHand.length > 0){
       return userHand.map((card) => {
-        return (<Card key={card.id} card={card} />)
+        return (<Card key={card.id}  currentUser={this.currentTurnUser()} handleCardClick={this.handleCardClick} card={card} />)
       })
+    }
+  }
+
+  handlePickedCards = () => {
+    let pickedCards = this.state.room.roomData.currentTurn.pickedCards
+    if(pickedCards && pickedCards.length > 0){
+      return pickedCards.map((card) => {
+        return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={() => {}} card={card} />)
+      })
+    }
+  }
+
+  handleCardClick = (cardID) => {
+    let room = this.state.room
+    if(room.roomData.roomReady && room.roomData.currentTurn.pickedCards.filter(userPick => userPick.userId == this.state.userLoggedIn).length < room.roomData.currentTurn.pick){
+      //Step 1: Add card to pickedCards
+      room.roomData.currentTurn.pickedCards.push({userId: this.state.userLoggedIn, card: cardID})
+      //Step 2: Delete Card from hand
+
+      room.roomData.currentTurn.currentHands.map(player => {
+
+        if(player.userId == this.state.userLoggedIn){
+          _.pull(player.hand, cardID)
+          let currentHand = room.roomData.currentTurn.currentHands.filter(player => player.userId == this.state.userLoggedIn)[0].hand.length
+          for(currentHand; currentHand < 5; currentHand++) {
+            player.hand.push(_.random(0,460))
+          }
+        }
+      })
+
+      //Step 3: Submit new room object to /api/v1/submit
+      fetch('http://25.57.52.41:1337/api/v1/rooms/submit',{
+        method: "POST",
+        headers: {
+          'Content-type':'application/json',
+          'Accept':'application/json'
+        },
+        body: JSON.stringify({room: room})
+      })
+      //Should hit socket when complete
     }
   }
 
@@ -106,13 +146,24 @@ class Room extends Component{
         </div>
 
         <br></br>
-        <h3>Blackcard</h3>
+        <br></br>
 
         {this.state.room && this.state.room.roomData.roomReady ?
           <div className="ui one column grid">
+            <h3>Blackcard: Pick {this.state.room.roomData.currentTurn.pick}</h3>
             <BlackCard card={this.state.room.roomData.currentTurn.blackCard} />
           </div> : null
         }
+
+        <br></br>
+
+        {this.state.room && this.state.room.roomData.currentTurn.pickedCards.length > 0 ?
+        <div className="ui six column grid">
+          <h3>Picked Cards</h3>
+          {this.handlePickedCards()}
+        </div> : null
+        }
+
 
       </div>
     )
