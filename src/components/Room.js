@@ -38,7 +38,7 @@ class Room extends Component{
 
       event.data.roomData.currentTurn.currentHands.find((player) => {
         if(player.userId === this.state.userLoggedIn){
-          UserAdapter.getHand(player.hand).then(resp => this.setState({userHand: resp, room: event.data}, this.handlePickedCards)
+          UserAdapter.getHand(player.hand).then(resp => this.setState({userHand: resp, room: event.data, pickedCards: []}, this.handlePickedCards)
         )}
       })
         break;
