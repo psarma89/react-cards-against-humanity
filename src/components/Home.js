@@ -20,10 +20,6 @@ class Home extends Component{
   }
 
   componentDidMount(){
-    // AuthAdapter.currentUser().then(resp => {
-    //   console.log('username', resp.response.data)
-    //   this.setState({username: resp.response.data.user.id})
-    // })
 
     var io = sailsIOClient(socketIOClient);
     io.sails.useCORSRouteToGetCookie = false;
@@ -33,10 +29,17 @@ class Home extends Component{
       this.setState({rooms: data, selectedRoom: [data[0]]})
       io.socket.on('new_entry', (entry) => {
         //console.log(entry)
-        this.setState({rooms: [...this.state.rooms, entry]})
+        this.setState({rooms: [...this.state.rooms, entry]}, this.getUsername)
       })
     })
 
+  }
+
+  getUsername = () => {
+    AuthAdapter.currentUser().then(resp => {
+      console.log('username', resp.response.data)
+      this.setState({username: resp.response.data.user.username})
+    })
   }
 
   handleRooms = () => {

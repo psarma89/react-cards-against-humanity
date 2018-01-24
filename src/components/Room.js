@@ -25,30 +25,27 @@ class Room extends Component{
       // console.log(resp.response.data.user.id)
       this.setState({userLoggedIn: resp.response.data.user.id})
     })
-      var io = sailsIOClient(socketIOClient);
-      io.sails.useCORSRouteToGetCookie = false;
-      io.sails.headers = {'Authorization': localStorage.getItem('token')}
-      io.sails.url = 'http://192.168.4.196:1337';
-      io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
-        // console.log('what is my data', data)
+    var io = sailsIOClient(socketIOClient);
+    io.sails.useCORSRouteToGetCookie = false;
+    io.sails.headers = {'Authorization': localStorage.getItem('token')}
+    io.sails.url = 'http://192.168.4.196:1337';
+    io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
 
-        //console.log(data.roomData.players.find((player) => {return player.userId == this.state.userLoggedIn})
+    })
+    io.socket.on("room", (event) => {
+      switch (event.verb) {
+      case 'updated':
 
+      event.data.roomData.currentTurn.currentHands.find((player) => {
+        if(player.userId === this.state.userLoggedIn){
+          UserAdapter.getHand(player.hand).then(resp => this.setState({userHand: resp, room: event.data}, this.handlePickedCards)
+        )}
       })
-      io.socket.on("room", (event) => {
-        switch (event.verb) {
-        case 'updated':
-
-        event.data.roomData.currentTurn.currentHands.find((player) => {
-          if(player.userId === this.state.userLoggedIn){
-            UserAdapter.getHand(player.hand).then(resp => this.setState({userHand: resp, room: event.data}, this.handlePickedCards)
-          )}
-        })
-          break;
-        default:
-          console.warn('Unrecognized socket event (`%s`) from server:',event.verb, event);
-        }
-      })
+        break;
+      default:
+        console.warn('Unrecognized socket event (`%s`) from server:',event.verb, event);
+      }
+    })
   }
 
   handleCards = () => {
@@ -68,26 +65,50 @@ class Room extends Component{
       UserAdapter.getHand(arrayOfPickedCards).then(resp => {
 
         this.setState({pickedCards: resp})
-        // return resp.map(card => {
-        //   console.log(card)
-        //   return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={() => {}} card={card} />)
-        // })
       })
-
-      // return pickedCards.map((card) => {
-      //   return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={() => {}} card={card} />)
-      // })
     }
   }
 
   renderPickedCards = () => {
     return this.state.pickedCards.map((card) => {
-      return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={() => {}} card={card} />)
+      return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={this.handlePickedClicked} card={card} />)
     })
   }
 
+  currentUserObj = () => {
+    let room = this.state.room
+    if (this.state.userLoggedIn) {
+      const currentPlayer = room.roomData.players.find(player => {
+        return player.userId === this.state.userLoggedIn
+      })
+      return currentPlayer
+    }else {
+      return {}
+    }
+  }
+
+  handlePickedClicked = (cardID) => {
+    let room = this.state.room
+    let pickedUser = room.roomData.currentTurn.pickedCards.find(userPick => userPick.card === cardID).userId
+    //Give user a point
+    room.roomData.players.find(player => {
+      if(player.userId === pickedUser){
+        player.score++
+      }
+    })
+    //Change turn
+    room.roomData.currentTurn.userId = room.roomData.players[_.random(0, room.roomData.players.length-1)].userId
+
+    room.roomData.currentTurn.pickedCards = []
+
+    room.roomData.currentTurn.blackCard =  _.random(1,89)
+    console.log(room)
+    //Submit new room
+    RoomAdapter.submitRoom(room).then(this.setState({pickedCards: []}))
+  }
+
   handleCardClick = (cardID) => {
-    console.log(this.state.room.roomData.currentTurn.pickedCards)
+
     let room = this.state.room
     if(room.roomData.roomReady && room.roomData.currentTurn.pickedCards.filter(userPick => userPick.userId == this.state.userLoggedIn).length < room.roomData.currentTurn.pick){
       //Step 1: Add card to pickedCards
@@ -106,14 +127,13 @@ class Room extends Component{
       })
 
       //Step 3: Submit new room object to /api/v1/submit
-      RoomAdapter.submitRoom(room)
+      RoomAdapter.submitCards(room)
       //Should hit socket when complete
     }
   }
 
   readyPlayer = () => {
     UserAdapter.readyPlayer({roomId: this.props.match.params.id}).then(resp => {
-      console.log(resp)
       // console.log(this.state.room)
       if(resp.data){
         this.setState({room: resp.data}, () => console.log(this.state.room))
@@ -131,13 +151,13 @@ class Room extends Component{
     const foundUser = this.state.room.roomData.players.find(player => {
       return player.userId === currentTurnId
     })
+    console.log(foundUser)
     // console.log(currentTurnId, foundUser)
     // const coolBeans = {"username": "someValue"}
     return foundUser
   }
 
   render(){
-    console.log(this.state.room)
     return(
       <div>
         <div className="ui button" onClick={this.readyPlayer}>Ready
@@ -145,10 +165,12 @@ class Room extends Component{
 
         <br></br>
 
-      {this.state.room && this.state.room.roomData.roomReady ?
-        <h3>{this.whoseTurnIsIt() ? `Whose Turn is it: ${this.whoseTurnIsIt().username}` : "ghost"}</h3>
-        : <h3>Room Not Ready. Dilly Dilly</h3>
-      }
+        {this.state.room && this.state.room.roomData.roomReady ? <h3>{`User: ${this.currentUserObj().username}, Points: ${this.currentUserObj().score}`}</h3> : null}
+
+        {this.state.room && this.state.room.roomData.roomReady ?
+          <h3>{this.whoseTurnIsIt() ? `Whose Turn is it: ${this.whoseTurnIsIt().username}` : null}</h3>
+          : <h3>Room Not Ready. Dilly Dilly</h3>
+        }
 
         <h3>Your Hand:</h3>
 

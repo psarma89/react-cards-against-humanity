@@ -7,7 +7,8 @@ import {RoomAdapter} from './Adapter';
 const RoomDetail = ({room}) => {
   // console.log(room)
   let players;
-  if (room.roomData.players.length > 0) {
+  console.log(room)
+  if (room && room.roomData.players.length > 0) {
     players = room.roomData.players.map(player => {
       return <li key={player.userId}>{player.username}</li>
     })
