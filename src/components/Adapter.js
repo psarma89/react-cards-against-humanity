@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 //HOORAY!
 
-const baseUrl = 'http://25.57.52.41:1337/api/v1'
+const baseUrl = 'http://192.168.4.196:1337/api/v1'
 
 export class AuthAdapter {
   static login(loginParams) {

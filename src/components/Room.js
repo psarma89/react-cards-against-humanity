@@ -27,7 +27,7 @@ class Room extends Component{
       var io = sailsIOClient(socketIOClient);
       io.sails.useCORSRouteToGetCookie = false;
       io.sails.headers = {'Authorization': localStorage.getItem('token')}
-      io.sails.url = 'http://25.57.52.41:1337';
+      io.sails.url = 'http://192.168.4.196:1337';
       io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
         // console.log('what is my data', data)
 

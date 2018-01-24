@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {RoomAdapter} from './Adapter';
+import {RoomAdapter, AuthAdapter} from './Adapter';
 import RoomList from './RoomList';
 import RoomDetail from './RoomDetail';
 import { Redirect } from 'react-router';
@@ -20,14 +20,14 @@ class Home extends Component{
   }
 
   componentDidMount(){
-    AuthAdapter.currentUser().then(resp => {
-      console.log('username', resp.response.data)
-      this.setState({username: resp.response.data.user.id})
-    })
+    // AuthAdapter.currentUser().then(resp => {
+    //   console.log('username', resp.response.data)
+    //   this.setState({username: resp.response.data.user.id})
+    // })
 
     var io = sailsIOClient(socketIOClient);
     io.sails.useCORSRouteToGetCookie = false;
-    io.sails.url = 'http://25.57.52.41:1337';
+    io.sails.url = 'http://192.168.4.196:1337';
     io.socket.get('/api/v1/rooms', (data, jwr) => {
 
       this.setState({rooms: data, selectedRoom: [data[0]]})
@@ -56,6 +56,8 @@ class Home extends Component{
     return(
       <div className="ui grid">
         <div className="four wide column">
+          <h3>{`Welcome ${this.state.username}`}</h3>
+
           <Link to="/room/create"
             className="ui labeled icon button">
             <i className="plus icon"></i>
@@ -64,8 +66,9 @@ class Home extends Component{
 
           {this.handleRooms()}
         </div>
+
+
         {this.state.rooms.length > 0 && this.state.selectedRoom.length > 0 ?
-          <h3>{`Welcome ${this.state.username}`}</h3>
           <div className="twelve wide column">
             <RoomDetail room={this.state.selectedRoom[0]} />
           </div> : null
