@@ -13,7 +13,8 @@ class Room extends Component{
 
     this.state = {
       userHand: '',
-      userLoggedIn: ''
+      userLoggedIn: '',
+      pickedCards: ''
     }
 
   }
@@ -21,9 +22,9 @@ class Room extends Component{
   componentDidMount(){
 
     AuthAdapter.currentUser().then(resp => {
-        // console.log(resp.response.data.user.id)
-        this.setState({userLoggedIn: resp.response.data.user.id})
-      })
+      // console.log(resp.response.data.user.id)
+      this.setState({userLoggedIn: resp.response.data.user.id})
+    })
       var io = sailsIOClient(socketIOClient);
       io.sails.useCORSRouteToGetCookie = false;
       io.sails.headers = {'Authorization': localStorage.getItem('token')}
@@ -40,8 +41,8 @@ class Room extends Component{
 
         event.data.roomData.currentTurn.currentHands.find((player) => {
           if(player.userId === this.state.userLoggedIn){
-            UserAdapter.getHand(player.hand).then(resp => this.setState({userHand: resp, room: event.data}))
-          }
+            UserAdapter.getHand(player.hand).then(resp => this.setState({userHand: resp, room: event.data}, this.handlePickedCards)
+          )}
         })
           break;
         default:
@@ -62,13 +63,31 @@ class Room extends Component{
   handlePickedCards = () => {
     let pickedCards = this.state.room.roomData.currentTurn.pickedCards
     if(pickedCards && pickedCards.length > 0){
-      return pickedCards.map((card) => {
-        return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={() => {}} card={card} />)
+      const arrayOfPickedCards = pickedCards.map(card => card.card)
+
+      UserAdapter.getHand(arrayOfPickedCards).then(resp => {
+
+        this.setState({pickedCards: resp})
+        // return resp.map(card => {
+        //   console.log(card)
+        //   return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={() => {}} card={card} />)
+        // })
       })
+
+      // return pickedCards.map((card) => {
+      //   return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={() => {}} card={card} />)
+      // })
     }
   }
 
+  renderPickedCards = () => {
+    return this.state.pickedCards.map((card) => {
+      return (<Card key={card.id}  currentUser={!this.currentTurnUser()} handleCardClick={() => {}} card={card} />)
+    })
+  }
+
   handleCardClick = (cardID) => {
+    console.log(this.state.room.roomData.currentTurn.pickedCards)
     let room = this.state.room
     if(room.roomData.roomReady && room.roomData.currentTurn.pickedCards.filter(userPick => userPick.userId == this.state.userLoggedIn).length < room.roomData.currentTurn.pick){
       //Step 1: Add card to pickedCards
@@ -87,14 +106,7 @@ class Room extends Component{
       })
 
       //Step 3: Submit new room object to /api/v1/submit
-      fetch('http://25.57.52.41:1337/api/v1/rooms/submit',{
-        method: "POST",
-        headers: {
-          'Content-type':'application/json',
-          'Accept':'application/json'
-        },
-        body: JSON.stringify({room: room})
-      })
+      RoomAdapter.submitRoom(room)
       //Should hit socket when complete
     }
   }
@@ -125,7 +137,6 @@ class Room extends Component{
   }
 
   render(){
-
     console.log(this.state.room)
     return(
       <div>
@@ -157,10 +168,11 @@ class Room extends Component{
 
         <br></br>
 
-        {this.state.room && this.state.room.roomData.currentTurn.pickedCards.length > 0 ?
+        <h3>Picked Cards</h3>
+
+        {this.state.room && this.state.pickedCards.length > 0 ?
         <div className="ui six column grid">
-          <h3>Picked Cards</h3>
-          {this.handlePickedCards()}
+          {this.renderPickedCards()}
         </div> : null
         }
 

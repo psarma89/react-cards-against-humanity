@@ -44,6 +44,28 @@ export class AuthAdapter {
 }
 
 export class RoomAdapter{
+  static submitRoom(payload){
+    return fetch(`${baseUrl}/rooms/submit`,{
+      method: "POST",
+      headers: {
+        'Content-type':'application/json',
+        'Accept':'application/json'
+      },
+      body: JSON.stringify({room: payload})
+    })
+  }
+
+  static submitRoom(payload){
+   return fetch(`${baseUrl}/rooms/submit`,{
+     method: "POST",
+     headers: {
+       'Content-type':'application/json',
+       'Accept':'application/json'
+     },
+     body: JSON.stringify({room: payload})
+   })
+ }
+
   static createRoom(payload){
     return fetch(`${baseUrl}/rooms/create`, {
       method: 'POST',
