@@ -9,8 +9,7 @@ class Navbar extends Component{
           <img src="https://i.ytimg.com/vi/iEV_bCe4VUk/maxresdefault.jpg" alt="cards logo"/>
         </div>
 
-        <div className="item">Cards Against Humanity..sort of
-        </div>
+        <div className="item">Cards Against Illuminati</div>
 
         <div className="right menu">
           {this.props.isloggedIn ? (

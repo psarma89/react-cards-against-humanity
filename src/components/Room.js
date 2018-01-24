@@ -87,6 +87,15 @@ class Room extends Component{
     }
   }
 
+  handleUsers = () => {
+    let room = this.state.room
+    if (room && room.roomData.players.length > 0) {
+      return room.roomData.players.map(player => {
+        return <li key={player.userId}>{player.username}</li>
+      })
+    }
+  }
+
   handlePickedClicked = (cardID) => {
     let room = this.state.room
     let pickedUser = room.roomData.currentTurn.pickedCards.find(userPick => userPick.card === cardID).userId
@@ -167,8 +176,11 @@ class Room extends Component{
 
         {this.state.room && this.state.room.roomData.roomReady ? <h3>{`User: ${this.currentUserObj().username}, Points: ${this.currentUserObj().score}`}</h3> : null}
 
+        <h3>Users in room:</h3>
+        {this.state.room ? <ul>{this.handleUsers()}</ul> : null}
+
         {this.state.room && this.state.room.roomData.roomReady ?
-          <h3>{this.whoseTurnIsIt() ? `Whose Turn is it: ${this.whoseTurnIsIt().username}` : null}</h3>
+          <h3>{this.whoseTurnIsIt() ? `Currently Choosing: ${this.whoseTurnIsIt().username}` : null}</h3>
           : <h3>Room Not Ready. Dilly Dilly</h3>
         }
 
