@@ -41,7 +41,7 @@ class App extends Component {
   handleFormSignIn = (username, password) => {
     AuthAdapter.login({username: username, password: password})
     .then( user => {
-      console.log(user)
+
       if(user.response.data){
         this.setState({auth: {isLoggedIn: true, user: user}});
         localStorage.setItem('token', user.response.data.token);

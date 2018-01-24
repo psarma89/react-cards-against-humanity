@@ -26,7 +26,7 @@ class Home extends Component{
     io.sails.url = 'http://192.168.4.196:1337';
     io.socket.get('/api/v1/rooms', (data, jwr) => {
 
-      this.setState({rooms: data, selectedRoom: [data[0]]})
+      this.setState({rooms: data, selectedRoom: [data[0]]}, this.getUsername)
       io.socket.on('new_entry', (entry) => {
         //console.log(entry)
         this.setState({rooms: [...this.state.rooms, entry]}, this.getUsername)
@@ -37,8 +37,7 @@ class Home extends Component{
 
   getUsername = () => {
     AuthAdapter.currentUser().then(resp => {
-      console.log('username', resp.response.data)
-      this.setState({username: resp.response.data.user.username})
+      this.setState({username: resp.response.data.user.username}, () => console.log('username', resp))
     })
   }
 
