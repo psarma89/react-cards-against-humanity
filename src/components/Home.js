@@ -17,7 +17,7 @@ class Home extends Component{
     }
     var io = sailsIOClient(socketIOClient);
     io.sails.useCORSRouteToGetCookie = false;
-    io.sails.url = 'http://192.168.4.196:1337';
+    io.sails.url = 'http://25.57.52.41:1337';
     io.socket.get('/api/v1/rooms', (data, jwr) => {
 
       this.setState({rooms: data, selectedRoom: [data[0]]})

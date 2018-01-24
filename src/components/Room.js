@@ -26,7 +26,7 @@ class Room extends Component{
       var io = sailsIOClient(socketIOClient);
       io.sails.useCORSRouteToGetCookie = false;
       io.sails.headers = {'Authorization': localStorage.getItem('token')}
-      io.sails.url = 'http://192.168.4.196:1337';
+      io.sails.url = 'http://25.57.52.41:1337';
       io.socket.get('/api/v1/rooms/subscribe', {roomID: this.props.match.params.id}, (data, jwr) => {
         // console.log('what is my data', data)
 
@@ -71,22 +71,17 @@ class Room extends Component{
   }
 
   currentTurnUser = () => {
-    return this.state.userLoggedIn === this.state.room.roomData.currentTurn.currentUser
+    return this.state.userLoggedIn === this.state.room.roomData.currentTurn.userId
   }
 
   whoseTurnIsIt = () => {
-    var foundUser;
-    if (this.state.room && this.state.room.roomData) {
-      const currentTurn = this.state.room.roomData.currentTurn.userId;
-      this.state.room.roomData.players.find(player => {
-         if(player.userId == currentTurn){
-           foundUser = 18727368
-         }
-       })
-    }
-    console.log(foundUser)
+    const currentTurnId = this.state.room.roomData.currentTurn.userId;
+    const foundUser = this.state.room.roomData.players.find(player => {
+      return player.userId === currentTurnId
+    })
+    // console.log(currentTurnId, foundUser)
+    // const coolBeans = {"username": "someValue"}
     return foundUser
-
   }
 
   render(){
@@ -99,10 +94,11 @@ class Room extends Component{
 
         <br></br>
 
-      {console.log(this.whoseTurnIsIt())
+      {this.state.room && this.state.room.roomData.roomReady ?
+        <h3>{this.whoseTurnIsIt() ? `Whose Turn is it: ${this.whoseTurnIsIt().username}` : "ghost"}</h3>
+        : <h3>Room Not Ready. Dilly Dilly</h3>
       }
 
-        <br></br>
         <h3>Your Hand:</h3>
 
         <div className="ui six column grid">
